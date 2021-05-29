@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Request a song</title>
+  </head>
+  <body>
+    <form action="/search" method="get">
+      <input type="search" id="song_search" name="q" placeholder="Search songs..." value="{{ search_query }}">
+      <button type="submit">Search</button>
+    </form>
+    <ul id="search-results">
+      {% for result in search_results %}
+        <li>{{ result }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
