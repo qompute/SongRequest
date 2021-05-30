@@ -45,15 +45,14 @@ def song_requested(song_id):
                 'name': r.json()['name'],
                 'artists': [a['name'] for a in r.json()['artists']]}
         song_queue.put(json.dumps(song))
-        print(json.dumps(song))
     return redirect(url_for('request_song'))
 
-@app.route('/stream')
+@app.route('/stream', methods=['GET'])
 def listen_for_requests():
     def stream():
         while True:
             next_song = song_queue.get()
-            yield f'data: {next_song}\n\n'
+            yield f'event: Song request\ndata: {next_song}\n\n'
     return Response(stream(), mimetype='text/event-stream')
 
 def get_spotify_token():

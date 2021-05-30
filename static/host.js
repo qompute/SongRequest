@@ -1,11 +1,5 @@
-let nowPlaying = null;
-let queue = [];
-
-let source = new EventSource('/stream');
-source.onmessage = function (event) {
-  if (nowPlaying == null) {
-    nowPlaying = event.data;
-  } else {
-    queue.push(event.data);
-  }
-};
+const source = new EventSource('/stream');
+source.addEventListener('Song request', function(event) {
+  let requestLabel = document.getElementById('request_label');
+  requestLabel.innerHTML = event.data;
+});
