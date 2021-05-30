@@ -11,7 +11,11 @@
     </form>
     <ul id="search-results">
       {% for result in search_results %}
-        <li>{{ result }}</li>
+        <li>
+          <form action="/song/{{ result['id'] }}" method="post">
+            <button>{{ result['name_artist'] }}</button>
+          </form>
+        </li>
       {% endfor %}
     </ul>
   </body>
