@@ -1,4 +1,4 @@
-from config import spotify_client_id, spotify_client_secret
+from config import spotify_client_id, spotify_client_secret, redirect_uri
 import json
 import base64
 import queue
@@ -12,6 +12,32 @@ song_queue = queue.Queue()
 @app.route('/')
 def host():
     return render_template('host.html')
+
+@app.route('/login')
+def login_to_spotify():
+    params = {'client_id': spotify_client_id,
+              'response_type': 'code',
+              'redirect_uri': redirect_uri,
+              'scope': 'user-modify-playback-state',
+              'show_dialog': 'true'}
+    url = 'https://accounts.spotify.com/authorize?' + "&".join([f'{k}={v}' for k, v in params.items()])
+    return redirect(url)
+
+@app.route('/callback')
+def callback():
+    global access_token
+    if 'code' not in request.args:
+        return redirect(url_for('host'))
+    body = {'grant_type': 'authorization_code',
+            'code': request.args['code'],
+            'redirect_uri': redirect_uri}
+    string_bytes = f'{spotify_client_id}:{spotify_client_secret}'.encode('ascii')
+    encoded_bytes = base64.b64encode(string_bytes)
+    encoded_string = encoded_bytes.decode('ascii')
+    header = {'Authorization': f'Basic {encoded_string}'}
+    r = requests.post('https://accounts.spotify.com/api/token', data=body, headers=header)
+    access_token = r.json()['access_token']
+    return redirect(url_for('host'))
 
 @app.route('/request')
 def request_song():
@@ -45,6 +71,8 @@ def song_requested(song_id):
                 'name': r.json()['name'],
                 'artists': [a['name'] for a in r.json()['artists']]}
         song_queue.put(json.dumps(song))
+        params = {'uri': r.json()['uri']}
+        r = requests.post('https://api.spotify.com/v1/me/player/queue', data=params, headers=header)
     return redirect(url_for('request_song'))
 
 @app.route('/stream', methods=['GET'])
