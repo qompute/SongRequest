@@ -3,13 +3,13 @@
 SongRequest is a web application that connects to your Spotify queue and allows others to add songs to your queue. It is great for handling song requests when playing music in a group setting!
 
 ## How to run locally
-This project uses [Flask](https://developer.spotify.com/). To install flask, run
+This project uses [Flask](https://flask.palletsprojects.com). To install flask, run
 ```
 pip install Flask
 ```
-To create your own local instance, you will need a [Spotify Developer](https://developer.spotify.com/dashboard/) account to use the Spotify API.
+To create your own local instance, you will need a [Spotify Developer](https://developer.spotify.com) account to use the Spotify API.
 
-1. Log in to your Spotify account, go to your [Dashboard](https://developer.spotify.com/dashboard/applications), and create a new app. You should see a Client ID and Client Secret on the project page.
+1. Log in to your Spotify account, go to your [Dashboard](https://developer.spotify.com/dashboard), and create a new app. You should see a Client ID and Client Secret on the project page.
 2. Create a new file in the project directory named `config.py`. This file will contain the API keys:
 ```
 spotify_client_id = "your_spotify_client_id"
