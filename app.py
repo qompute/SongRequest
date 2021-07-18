@@ -57,7 +57,17 @@ def search_song():
         search_results = []
         for item in r.json()['tracks']['items']:
             artists = [a['name'] for a in item['artists']]
-            result = {'id': item['id'], 'name_artist': f'{item["name"]} - {", ".join(artists)}'}
+            images = item['album']['images']
+            image_url = ''
+            for image in images:
+                if image['height'] == 64 and image['width'] == 64:
+                    image_url = image['url']
+            result = {
+                'id': item['id'],
+                'name': item["name"],
+                'artists': ", ".join(artists),
+                'image_url': image_url
+            }
             search_results.append(result)
         return render_template('request.html', search_query=query, search_results=search_results)
     return request_song()

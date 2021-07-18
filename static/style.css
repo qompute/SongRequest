@@ -1,0 +1,73 @@
+html {
+  background-color: #F5F5F5;
+}
+
+body {
+  font-family: Arial;
+  margin: 0 auto;
+  padding: 20px 20px 20px 20px;
+}
+
+button {
+  background-color: #3030FF;
+  padding: 6px 6px;
+  border: 2px solid blue;
+  font-size: 14px;
+  color: white;
+}
+
+button:active {
+  background-color: #0000FF;
+}
+
+button:hover {
+  background-color: #5050FF;
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+}
+
+input {
+  flex: auto;
+  padding: 6px 6px;
+}
+
+#search-results {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#search-results button {
+  flex: auto;
+  background-color: white;
+  border: 1px solid lightgray;
+  color: black;
+  text-align: left;
+}
+
+#search-results button:hover {
+  background-color: lightgray;
+}
+
+#search-results button:active {
+  background-color: gray;
+}
+
+#search-results img {
+  float: left;
+  width: 48px;
+  height: 48px;
+  margin: 4px 8px 4px 4px;
+}
+
+#search-results h1 {
+  font-size: 16px;
+  margin: 8px 0 4px 0;
+}
+
+#search-results h2 {
+  font-size: 14px;
+  margin: 0;
+}

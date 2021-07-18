@@ -3,20 +3,25 @@
   <head>
     <meta charset="utf-8">
     <title>Request a song</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
     <form action="/search" method="get">
       <input type="search" id="song_search" name="q" placeholder="Search songs..." value="{{ search_query }}">
       <button type="submit">Search</button>
     </form>
-    <ul id="search-results">
+    <div id="search-results">
       {% for result in search_results %}
-        <li>
-          <form action="/song/{{ result['id'] }}" method="post">
-            <button>{{ result['name_artist'] }}</button>
-          </form>
-        </li>
+        <form action="/song/{{ result['id'] }}" method="post">
+          <button>
+            <img src="{{ result['image_url'] }}">
+            <span>
+              <h1> {{ result['name'] }} </h1>
+              <h2> {{ result['artists'] }} </h2>
+            </span>
+          </button>
+        </form>
       {% endfor %}
-    </ul>
+    </div>
   </body>
 </html>
