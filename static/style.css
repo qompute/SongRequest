@@ -6,14 +6,15 @@ body {
   font-family: Arial;
   margin: 0 auto;
   padding: 20px 20px 20px 20px;
+  text-align: center;
 }
 
 button {
   background-color: #3030FF;
   padding: 6px 6px;
-  border: 2px solid blue;
   font-size: 14px;
   color: white;
+  border: none;
 }
 
 button:active {
@@ -24,19 +25,24 @@ button:hover {
   background-color: #5050FF;
 }
 
-form {
-  display: flex;
-  flex-direction: row;
-}
-
 input {
   flex: auto;
   padding: 6px 6px;
 }
 
+#search-bar {
+  display: flex;
+  flex-direction: row;
+}
+
 #search-results {
   width: 100%;
   margin-top: 10px;
+}
+
+#search-results form {
+  display: flex;
+  flex-direction: row;
 }
 
 #search-results button {
@@ -70,4 +76,33 @@ input {
 #search-results h2 {
   font-size: 14px;
   margin: 0;
+}
+
+#login-spotify {
+  background-color: #1DB954;
+  border-radius: 6px;
+  border: none;
+  padding: 8px 12px;
+  margin: auto;
+  display: block;
+}
+
+#login-spotify:hover {
+  background-color: #39E376;
+}
+
+#login-spotify:active {
+  background-color: #0F6B2F;
+}
+
+#room-field::-webkit-inner-spin-button, #room-field::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+#room-code-label {
+  font-size: 48px;
+  margin: 0 0;
 }

@@ -2,17 +2,18 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Request a song</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <form action="/search" method="get">
+    <form id="search-bar" action="/{{ room_code }}/search" method="get">
       <input type="search" id="song_search" name="q" placeholder="Search songs..." value="{{ search_query }}">
       <button type="submit">Search</button>
     </form>
     <div id="search-results">
       {% for result in search_results %}
-        <form action="/song/{{ result['id'] }}" method="post">
+        <form action="/{{ room_code }}/song/{{ result['id'] }}" method="post">
           <button>
             <img src="{{ result['image_url'] }}">
             <span>

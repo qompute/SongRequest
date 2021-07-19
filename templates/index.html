@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SongRequest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <p>Join a room</p>
+    <form action="/room" method="get">
+      <input id="room-field" type="number" name="room" placeholder="Enter room code...">
+      <button type="submit">Join</button>
+    </form>
+    <p style="margin-top: 64px"> or create your own room </p>
+    <form action="/login">
+      <button id="login-spotify">
+        Log in with Spotify
+      </button>
+    </form>
+  </body>
+</html>

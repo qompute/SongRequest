@@ -2,16 +2,35 @@ from config import spotify_client_id, spotify_client_secret, redirect_uri
 import json
 import base64
 import queue
+import random
 import requests
 from flask import Flask, render_template, request, Response, redirect, url_for
 
 app = Flask(__name__)
 
+rooms = {}
 song_queue = queue.Queue()
 
 @app.route('/')
-def host():
-    return render_template('host.html')
+def index():
+    return render_template('index.html')
+
+@app.route('/<int:room_code>/host')
+def host(room_code):
+    if room_code not in rooms:
+        return redirect(url_for('index'))
+    else:
+        return render_template('host.html', room_code=room_code)
+
+@app.route('/room', methods=['GET'])
+def find_room():
+    if 'room' not in request.args:
+        return redirect(url_for('index'))
+    room_code = request.args['room']
+    if room_code.isdigit() and int(room_code) in rooms:
+        return redirect(f'/{room_code}')
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/login')
 def login_to_spotify():
@@ -25,7 +44,6 @@ def login_to_spotify():
 
 @app.route('/callback')
 def callback():
-    global access_token
     if 'code' not in request.args:
         return redirect(url_for('host'))
     body = {'grant_type': 'authorization_code',
@@ -37,19 +55,30 @@ def callback():
     header = {'Authorization': f'Basic {encoded_string}'}
     r = requests.post('https://accounts.spotify.com/api/token', data=body, headers=header)
     access_token = r.json()['access_token']
-    return redirect(url_for('host'))
+    refresh_token = r.json()['refresh_token']
+    room_code = random.randrange(1000, 10000)
+    while room_code in rooms:
+        room_code = random.randrange(1000, 10000)
+    room = {'access_token': access_token, 'refresh_token': refresh_token}
+    rooms[room_code] = room
+    return redirect(f'/{room_code}/host')
 
-@app.route('/request')
-def request_song():
-    return render_template('request.html', search_query="", search_results=[])
+@app.route('/<int:room_code>')
+def request_in_room(room_code):
+    if room_code not in rooms:
+        return redirect(url_for('index'))
+    else:
+        return render_template('request.html', search_query="", search_results=[], room_code=room_code)
 
-@app.route('/search', methods=['GET'])
-def search_song():
+@app.route('/<int:room_code>/search', methods=['GET'])
+def search_song(room_code):
+    if room_code not in rooms:
+        return redirect(url_for('index'))
     if 'q' not in request.args:
-        return request_song()
+        return request_in_room(room_code)
     query = request.args['q']
     if len(query) == 0:
-        return request_song()
+        return request_in_room(room_code)
     params = {'q': query, 'type': 'track'}
     header = {'Authorization': f'Bearer {access_token}'}
     r = requests.get('https://api.spotify.com/v1/search', params=params, headers=header)
@@ -69,12 +98,15 @@ def search_song():
                 'image_url': image_url
             }
             search_results.append(result)
-        return render_template('request.html', search_query=query, search_results=search_results)
-    return request_song()
+        return render_template('request.html', search_query=query, search_results=search_results, room_code=room_code)
+    return request_in_room(room_code)
 
-@app.route('/song/<song_id>', methods=['POST'])
-def song_requested(song_id):
-    header = {'Authorization': f'Bearer {access_token}'}
+@app.route('/<int:room_code>/song/<song_id>', methods=['POST'])
+def song_requested(room_code, song_id):
+    if room_code not in rooms:
+        return redirect(url_for('index'))
+    room_access_token = rooms[room_code]['access_token']
+    header = {'Authorization': f'Bearer {room_access_token}'}
     r = requests.get(f'https://api.spotify.com/v1/tracks/{song_id}', headers=header)
     if r.status_code == 200:
         song = {'id': r.json()['id'],
@@ -83,10 +115,10 @@ def song_requested(song_id):
         song_queue.put(json.dumps(song))
         params = {'uri': r.json()['uri']}
         r = requests.post('https://api.spotify.com/v1/me/player/queue', data=params, headers=header)
-    return redirect(url_for('request_song'))
+    return redirect(f'/{room_code}')
 
-@app.route('/stream', methods=['GET'])
-def listen_for_requests():
+@app.route('/<int:room_code>/stream', methods=['GET'])
+def listen_for_requests(room_code):
     def stream():
         while True:
             next_song = song_queue.get()

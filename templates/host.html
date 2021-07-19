@@ -2,11 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SongRequest</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script type="text/javascript" src="static/host.js"></script>
   </head>
   <body>
-    <p id=request_label></p>
+    <p>To request songs, enter this room code:</p>
+    <p id="room-code-label"> {{ room_code }} </p>
   </body>
 </html>
