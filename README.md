@@ -8,7 +8,6 @@ The host of a room needs a Spotify Premium account. They can create a room by lo
 To request a song, simply enter the room code and then search for a song. Once you select a song, it will be added to the end of the host's Spotify queue. You do not need a Spotify account to request songs.
 
 The song request page is designed to look good on mobile, so people can request songs from their phone!
-![Screenshot of Song Request Page](docs/images/song-request-screenshot.png)
 
 ## How to run locally
 This project uses [Flask](https://flask.palletsprojects.com). To install flask, run
