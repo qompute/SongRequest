@@ -114,7 +114,7 @@ def song_requested(room_code, song_id):
                 'artists': [a['name'] for a in r.json()['artists']]}
         song_queue.put(json.dumps(song))
         params = {'uri': r.json()['uri']}
-        r = requests.post('https://api.spotify.com/v1/me/player/queue', data=params, headers=header)
+        r = requests.post('https://api.spotify.com/v1/me/player/queue', params=params, headers=header)
     return redirect(f'/{room_code}')
 
 @app.route('/<int:room_code>/stream', methods=['GET'])
