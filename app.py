@@ -32,13 +32,13 @@ def host_connected(data):
     if 'room_code' in data and data['room_code'] in rooms:
         rooms[data['room_code']]['request_sid'] = request.sid
 
-@socketio.on('disconnect')
-def host_disconnected():
-    room_to_delete = None
-    for room_code, room in rooms.items():
-        if room.get('request_sid') == request.sid:
-            room_to_delete = room_code
-    del rooms[room_to_delete]
+# @socketio.on('disconnect')
+# def host_disconnected():
+#     room_to_delete = None
+#     for room_code, room in rooms.items():
+#         if room.get('request_sid') == request.sid:
+#             room_to_delete = room_code
+#     del rooms[room_to_delete]
 
 @app.route('/room', methods=['GET'])
 def find_room():
