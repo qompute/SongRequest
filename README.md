@@ -13,6 +13,7 @@ The song request page is designed to look good on mobile, so people can request 
 This project uses [Flask](https://flask.palletsprojects.com). To install flask, run
 ```
 pip install Flask
+pip install flask-socketio
 ```
 To create your own local instance, you will need a [Spotify Developer](https://developer.spotify.com) account to use the Spotify API.
 

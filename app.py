@@ -1,12 +1,17 @@
 from config import spotify_client_id, spotify_client_secret, redirect_uri
 import json
+import time
 import base64
 import queue
 import random
 import requests
 from flask import Flask, render_template, request, Response, redirect, url_for
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
+socketio = SocketIO(app)
+if __name__ == '__main__':
+    socketio.run(app)
 
 rooms = {}
 song_queue = queue.Queue()
@@ -21,6 +26,19 @@ def host(room_code):
         return redirect(url_for('index'))
     else:
         return render_template('host.html', room_code=room_code)
+
+@socketio.on('host_connecting')
+def host_connected(data):
+    if 'room_code' in data and data['room_code'] in rooms:
+        rooms[data['room_code']]['request_sid'] = request.sid
+
+@socketio.on('disconnect')
+def host_disconnected():
+    room_to_delete = None
+    for room_code, room in rooms.items():
+        if room.get('request_sid') == request.sid:
+            room_to_delete = room_code
+    del rooms[room_to_delete]
 
 @app.route('/room', methods=['GET'])
 def find_room():
@@ -56,10 +74,11 @@ def callback():
     r = requests.post('https://accounts.spotify.com/api/token', data=body, headers=header)
     access_token = r.json()['access_token']
     refresh_token = r.json()['refresh_token']
+    expiration = time.time() + int(r.json()['expires_in'])
     room_code = random.randrange(1000, 10000)
     while room_code in rooms:
         room_code = random.randrange(1000, 10000)
-    room = {'access_token': access_token, 'refresh_token': refresh_token}
+    room = {'access_token': access_token, 'refresh_token': refresh_token, 'expiration': expiration}
     rooms[room_code] = room
     return redirect(f'/{room_code}/host')
 
@@ -106,6 +125,18 @@ def song_requested(room_code, song_id):
     if room_code not in rooms:
         return redirect(url_for('index'))
     room_access_token = rooms[room_code]['access_token']
+    room_expiration = rooms[room_code]['expiration']
+    if room_expiration <= time.time():
+        string_bytes = f'{spotify_client_id}:{spotify_client_secret}'.encode('ascii')
+        encoded_bytes = base64.b64encode(string_bytes)
+        encoded_string = encoded_bytes.decode('ascii')
+        header = {'Authorization': f'Basic {encoded_string}'}
+        body = {'grant_type': 'refresh_token', 'refresh_token': rooms[room_code]['refresh_token']}
+        r = requests.post('https://accounts.spotify.com/api/token', headers=header, data=body)
+        if r.status_code == 200:
+            room_access_token = r.json()['access_token']
+            rooms[room_code]['access_token'] = room_access_token
+            rooms[room_code]['expiration'] = time.time() + int(r.json()['expires_in'])
     header = {'Authorization': f'Bearer {room_access_token}'}
     r = requests.get(f'https://api.spotify.com/v1/tracks/{song_id}', headers=header)
     if r.status_code == 200:
